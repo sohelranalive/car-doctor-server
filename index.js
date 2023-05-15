@@ -21,7 +21,11 @@ const client = new MongoClient(uri, {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
-    }
+    },
+    //for data loading without pool request
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    maxPoolSize: 10,
 });
 
 const verifyJWT = (req, res, next) => {
@@ -45,7 +49,16 @@ const verifyJWT = (req, res, next) => {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+
+        // await client.connect();
+
+        //added for mongodb data loaded
+        client.connect((error) => {
+            if (error) {
+                console.log(error)
+                return;
+            }
+        });
 
         const servicesCollection = client.db('carDoctorDB').collection('services')
         const bookingsCollection = client.db('carDoctorDB').collection('bookings')
